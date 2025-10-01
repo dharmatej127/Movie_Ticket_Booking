@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype Pattern Assignment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+            color: #2d3748;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 3rem 2.5rem;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .section-box {
+            background-color: #f7fafc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+        h1 {
+            grid-column: 1 / -1;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        h2 {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        pre {
+            background-color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .log-box {
+            background-color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-4xl font-bold mb-4 text-center">Food Order Prototype Pattern</h1>
+    <p class="text-gray-600 text-center mb-6 col-span-full">
+        This demonstration shows how the Prototype Pattern allows an object to be cloned.
+        The cloned object is completely independent of the original.
+    </p>
+
+    <div class="section-box">
+        <h2 class="text-xl">Instructions</h2>
+        <ol class="list-decimal list-inside text-gray-600 space-y-1">
+            <li>Open the Developer Tools by right-clicking and selecting "Inspect".</li>
+            <li>Go to the "Console" tab to view the detailed process.</li>
+            <li>The final state of the objects is displayed below.</li>
+        </ol>
+    </div>
+
+    <div class="section-box">
+        <h2 class="text-xl">Original Order</h2>
+        <pre id="original-order-display" class="text-xs"></pre>
+    </div>
+
+    <div class="section-box">
+        <h2 class="text-xl">Cloned Order (Modified)</h2>
+        <pre id="cloned-order-display" class="text-xs"></pre>
+    </div>
+
+    <div class="section-box col-span-full">
+        <h2 class="text-xl">Process Log</h2>
+        <div id="console-output" class="log-box"></div>
+    </div>
+</div>
+
+<script>
+    // Utility function to log messages to both the console and the HTML page.
+    function log(message, type = 'info') {
+        const outputDiv = document.getElementById('console-output');
+        const p = document.createElement('p');
+        p.textContent = message;
+        
+        let classes = 'mb-1';
+        if (type === 'title') {
+            classes += ' font-bold text-lg text-gray-800';
+            p.textContent = `--- ${message} ---`;
+            console.log(`\n--- ${message} ---\n`);
+        } else if (type === 'subtitle') {
+            classes += ' font-semibold text-gray-700 mt-2';
+        } else if (type === 'result') {
+            classes += ' font-semibold text-blue-700 mt-4';
+        } else {
+            classes += ' text-gray-600';
+        }
+        
+        p.className = classes;
+        outputDiv.appendChild(p);
+        outputDiv.scrollTop = outputDiv.scrollHeight; // Auto-scroll to bottom
+        
+        console.log(message);
+    }
+    
+    // --- The Core Prototype Pattern Implementation ---
+
+    // Define the Concrete Prototype class (FoodOrder)
+    class FoodOrder {
+        constructor(customer, items, deliveryAddress) {
+            this.customer = customer;
+            this.items = items;
+            this.deliveryAddress = deliveryAddress;
+            log(`Created a new FoodOrder for ${this.customer.name}.`);
+        }
+
+        // The core method of the Prototype Pattern.
+        clone() {
+            // A simple way to deep clone in JavaScript for this example.
+            // This creates a new, independent object with no shared references.
+            const clonedObject = JSON.parse(JSON.stringify(this));
+            log(`Cloned an order for ${clonedObject.customer.name}.`);
+            return new FoodOrder(
+                clonedObject.customer,
+                clonedObject.items,
+                clonedObject.deliveryAddress
+            );
+        }
+    }
+
+    // --- Demonstration of the Pattern ---
+    window.onload = function() {
+        log("Demonstrating Prototype Pattern...", 'title');
+
+        // Step 1: Create the original (prototype) object
+        log("Creating the original order (prototype).");
+        const originalOrder = new FoodOrder(
+            { name: "Suresh Sharma", phone: "9876543210" },
+            [
+                { item: "Chicken Biryani", quantity: 1, price: 250 },
+                { item: "Coke", quantity: 1, price: 50 }
+            ],
+            { street: "123 Main Street", city: "Bengaluru", pincode: "560001" }
+        );
+        log("Original Order created.", 'subtitle');
+        
+        // Step 2: Clone the original object
+        log("Cloning the original order to create a new one.", 'title');
+        const clonedOrder = originalOrder.clone();
+        
+        // Step 3: Modify the cloned object.
+        log("Modifying the cloned order.", 'title');
+        clonedOrder.customer.name = "Priya Singh";
+        clonedOrder.deliveryAddress.street = "456 Oak Avenue";
+        clonedOrder.items[0].quantity = 2; // Change quantity
+        clonedOrder.items.push({ item: "Garlic Naan", quantity: 1, price: 40 }); // Add a new item
+        
+        // Step 4: Display the final states on the page
+        log("Displaying final states on the page.", 'title');
+        document.getElementById('original-order-display').textContent = JSON.stringify(originalOrder, null, 2);
+        document.getElementById('cloned-order-display').textContent = JSON.stringify(clonedOrder, null, 2);
+
+        // Final check
+        log("Final Verification:", 'title');
+        log(`Is originalOrder and clonedOrder the same object? ${originalOrder === clonedOrder}`);
+        log(`Are the customer objects the same? ${originalOrder.customer === clonedOrder.customer}`);
+        log(`Are the items arrays the same? ${originalOrder.items === clonedOrder.items}`);
+        log(`As you can see, the cloned object is a new, independent instance.`);
+    };
+
+</script>
+</body>
+</html>
